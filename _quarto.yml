@@ -11,8 +11,7 @@ website:
 
 format:
   html:
-    theme: flatly
-    css: styles.css
+    theme: [flatly, dom6.scss]
     toc: true
 
 
