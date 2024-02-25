@@ -1,0 +1,46 @@
+---
+title: Dominions Random Number (DRN)
+---
+
+The basic mechanics of Dominions is its special random roll called DRN.
+DRN is used in almost any situation, usually in the form of opposed roll (e.g., attacker and defender both roll DRN),
+so building the intuition and understanding the mathematics behind this mechanics is important for quickly grogging the chances of success or failure.
+
+DRN is exploding `2d6`. This means two rolls of six-sided dice added together. The *exploding* modifier is sometimes noted with `+` or `!` for `2d6+` and is commonly understood as ability to reroll a dice if the maximal value was achieved. In the context of Dominions the mechanics of single exploding dice `d6+`:
+
+* Roll D6
+  - if 6 was achieved, subtract 1 and repeat
+* sum rolls
+
+
+In R, this could be implemented using as `roll_plus` function:
+
+```{r}
+#' Simple d6 roll
+roll = function(){
+    sample(1:6, 1)
+    }
+
+#' exploding d6+ roll
+roll_plus = function(){
+    x = 0
+    while({r = roll()} == 6){
+        x = x + r - 1
+        }
+    x = x + r
+    x
+    }
+```
+
+Note that unlike other definition of exploding dice, the exploding dice in Dominions subtract one each time the maximum is rolled. This has interesting property. For normal dice, each number on dice ranging from `1` to `6` has probability `P(X = x) = 1/6`. For exploding dice, this remains true for `1` to `5`, but the probability of `6` is distributed into progressively larger and larger exploding rolls. This essentially means that the probability rolling 6 and more is `P(X > 5) = 1/6`. See following simulation of `100,000` `d6+` rolls.
+
+```{r, echo = FALSE, cache = TRUE}
+par("bg" = "#e5dfd7")
+set.seed(1)
+replicate(100000, roll_plus()) |>
+    table() |>
+    proportions() |>
+    plot(las = 1, frame = FALSE, col = "#323131", lwd = 2,
+         ylab = "Proportions", xlab = "d6+ value")
+title(adj = 0, "Simulation of 100,000 random d6+ rolls")
+```
